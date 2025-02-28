@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padding Gambit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e1e2f, #2e2e4f);
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .title {
+            position: absolute;
+            top: 5%;
+            font-size: 3rem;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 0.2rem;
+        }
+
+        .title span {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .title span:hover {
+            transform: translateY(-20px) rotate(20deg);
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-container h2 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .form-container input[type="text"] {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .form-container button {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background-color: #4a90e2;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #357ab8;
+        }
+
+        .response-message {
+            margin-top: 1rem;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .chess-piece {
+            position: absolute;
+            width: 50px;
+            opacity: 0.8;
+            animation: float 15s infinite ease-in-out, spin 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-50px) translateX(50px); }
+            50% { transform: translateY(0) translateX(100px); }
+            75% { transform: translateY(50px) translateX(50px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        <span>P</span><span>a</span><span>d</span><span>d</span><span>i</span><span>n</span><span>g</span>
+        <span> </span>
+        <span>G</span><span>a</span><span>m</span><span>b</span><span>i</span><span>t</span>
+    </div>
+
+    <div class="form-container">
+        <h2>Enter Your Code</h2>
+        <input type="text" id="code-input" placeholder="Enter code here">
+        <button id="submit-button">Submit</button>
+        <div class="response-message" id="response-message"></div>
+    </div>
+
+    <script>
+        let apiToken = '';
+        window.onload = function() {
+            fetch('/api/token')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch token: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    apiToken = data.token;
+                    console.log('Received API Token:', apiToken);
+                })
+                .catch(error => console.error('Error fetching API token:', error));
+        };
+
+        document.getElementById('submit-button').addEventListener('click', function() {
+            const codeInput = document.getElementById('code-input').value;
+            const responseMessage = document.getElementById('response-message');
+
+            fetch(`/api/submit/${apiToken}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: codeInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseMessage.textContent = data.message || `Error: ${data.error}`;
+            })
+            .catch(error => {
+                responseMessage.textContent = 'An error occurred. Please try again.';
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+    <img src="/images/Chess_nlt60.png" class="chess-piece" style="top: 10%; left: 20%; animation-delay: 0s;">
+    <img src="/images/Chess_rlt60.png" class="chess-piece" style="top: 50%; left: 70%; animation-delay: 2s;">
+    <img src="/images/Chess_blt60.png" class="chess-piece" style="top: 30%; left: 40%; animation-delay: 4s;">
+    <img src="/images/Chess_plt60.png" class="chess-piece" style="top: 70%; left: 10%; animation-delay: 6s;">
+    <img src="/images/Chess_qlt60.png" class="chess-piece" style="top: 20%; left: 80%; animation-delay: 8s;">
+</body>
+</html>
